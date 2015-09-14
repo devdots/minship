@@ -1,7 +1,8 @@
 The MIT License
 ===============
 
-Copyright © 2013 Artem Sapegin (http://sapegin.me), contributors
+Copyright © 2015 Florin Iacob (BigDot) (http://devdots.com), contributors
+Original source is copyrighted by Artem Sapegin (http://sapegin.me), contributors
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
