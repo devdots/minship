@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+binpath=/usr/bin/minship
+curl -o $binpath https://raw.githubusercontent.com/devdots/minship/master/bin/minship
+chmod +x $binpath
