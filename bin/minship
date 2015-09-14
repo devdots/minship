@@ -26,6 +26,7 @@ CYAN="$(tput setaf 6)"
 UNDERLINE="$(tput sgr 0 1)"
 BOLD="$(tput bold)"
 NOCOLOR="$(tput sgr0)"
+function meta() { echo -e "$GREEN$1$NOCOLOR\n"; }
 function header() { echo -e "$UNDERLINE$CYAN$1$NOCOLOR\n"; }
 function error() { echo -e "$UNDERLINE$RED$1$NOCOLOR\n"; }
 
@@ -168,6 +169,13 @@ copy_to_remote() {
 	scp "$1" "seal:$SSH_PATH/$1"
 }
 
+custom_config() {
+  conf=$1
+  test "${conf:0:9}" = "--config=" && conf="${conf:9}"
+  meta "Using custom config $conf"
+  CONFIG=$conf
+}
+
 
 ########################################################################################################################
 
@@ -177,6 +185,9 @@ if [ -n "$arg" ]; then
 	case $arg in
 		-h|--help) usage; exit ;;
 		-V|--version) version; exit ;;
+		-c|--config) custom_config $1; shift; arg=$1; shift ;;
+		--config=*) custom_config $arg; arg=$1; shift ;;
+		-c|--config=*) echo "configs"; exit ;;
 		list|ls) list_targets; exit ;;
 		console|shell|ssh) open_console; exit ;;
 		exec|run) exec_command "$@"; exit ;;
