@@ -3,7 +3,8 @@
 #
 # Minimalistic SSH deployment.
 # 
-# Author: Artem Sapegin, sapegin.me
+# Author: BigDot (Florin Iacob) devdots.com
+# Original Author: Artem Sapegin, sapegin.me
 # License: MIT
 #
 # Inspired by:
@@ -13,7 +14,7 @@
 
 
 VERSION="0.0.5"
-CONFIG=./.shipit
+CONFIG=./Shipfile
 TARGET=deploy
 SSH_HOST=
 SSH_PATH=
