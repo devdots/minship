@@ -1,3 +1,7 @@
+### 2015-09-15
+
+* Forked the project under a new name "minship"
+
 ### 2015-07-14 v0.0.5
 
 * New command: copy.

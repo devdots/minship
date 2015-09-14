@@ -1,20 +1,19 @@
-# shipit :shipit:
+# minship
 
 Minimalistic SSH deployment.
 
-![shipit](http://blog.sapegin.me/images/mac__shipit.png)
 
 ## Installation
 
-    $ pathtoshipit=/usr/local/bin/shipit; curl -o $pathtoshipit https://raw.githubusercontent.com/sapegin/shipit/master/bin/shipit; chmod +x $pathtoshipit; unset pathtoshipit
+    $ binpath=/usr/bin/shipit; curl -o $binpatht https://raw.githubusercontent.com/devdots/minship/master/bin/shipit; chmod +x $binpath; unset binpath
 
 You can use this command to update shipit too.
 
-*Use `sudo` or replace `/usr/local/bin/shipit` to path somewhere inside your home directory.*
+*Use `sudo` or replace `/usr/bin/minship` to path somewhere inside your home directory.*
 
 ## Usage
 
-    shipit [command|option]
+    minship [command|option]
 
 ### Options
 
@@ -44,19 +43,19 @@ You can use this command to update shipit too.
 
 ### Examples
 
-    $ shipit
+    $ minship
 
 Will execute `deploy` target.
 
-    $ shipit status
+    $ minship status
 
 Will execute `status` target.
 
-    $ shipit list
+    $ minship list
 
 Will show a list of available targets.
 
-    $ shipit exec uptime
+    $ minship exec uptime
 
 Will execute `uptime` command on remote host.
 
