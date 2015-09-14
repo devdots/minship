@@ -10,7 +10,7 @@ Minimalistic SSH deployment.
         chmod +x $binpath; \
         unset binpath
 
-You can use this command to update shipit too.
+You can use this command to update minship too.
 
 *Use `sudo` or replace `/usr/bin/minship` to path somewhere inside your home directory.*
 
@@ -29,7 +29,7 @@ You can use this command to update shipit too.
 
 | Command         | Description |
 | --------------- | --- |
-| `<target>`      | Executes `target` target on remote host (run `shipit` to execute 'deploy' target) |
+| `<target>`      | Executes `target` target on remote host (run `minship` to execute 'deploy' target) |
 | list            | Print list of available targets |
 | console         | Open an SSH session on remote host |
 | exec `<cmd>`    | Execute `cmd` on remote host |
@@ -65,7 +65,7 @@ Will execute `uptime` command on remote host.
 
 ## Configuration
 
-You need to create `.shipit` file in your project’s directory.
+You need to create `Shipfile` file in your project’s directory.
 
 Here is a typical config:
 
@@ -91,7 +91,7 @@ It’s the same host you use in `ssh` command. It could be string of format `<us
 
 ### path
 
-Project path on remote host. shipit will `cd` to this directory before executing any command.
+Project path on remote host. minship will `cd` to this directory before executing any command.
 
 ### Targets
 
