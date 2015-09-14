@@ -5,7 +5,10 @@ Minimalistic SSH deployment.
 
 ## Installation
 
-    $ binpath=/usr/bin/shipit; curl -o $binpatht https://raw.githubusercontent.com/devdots/minship/master/bin/shipit; chmod +x $binpath; unset binpath
+    $ binpath=/usr/bin/minship; \
+        curl -o $binpath https://raw.githubusercontent.com/devdots/minship/master/bin/minship; \
+        chmod +x $binpath; \
+        unset binpath
 
 You can use this command to update shipit too.
 
