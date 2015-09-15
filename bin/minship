@@ -14,10 +14,11 @@
 
 
 VERSION="0.0.5"
-CONFIG=./Shipfile
+CONFIG=
 TARGET=deploy
 SSH_HOST=
 SSH_PATH=
+SSH_PORT=22
 
 # Common stuff
 RED="$(tput setaf 1)"
@@ -35,7 +36,7 @@ function error() { echo -e "$UNDERLINE$RED$1$NOCOLOR\n"; }
 usage() {
 	version
 	echo
-	echo "Usage: `basename $0` [command|option]"
+	echo "Usage: `basename $0` shipfile.ship [command|option]"
 	echo
 	echo "Options:"
 	echo
@@ -64,18 +65,13 @@ version() {
 	echo "`basename $0` v$VERSION"
 }
 
-# Print squirrel
-squirrel() {
-	echo "$WHITE"
-	echo "    __  (\\_    ⎧ ⎻⎻⎻⎻⎻⎻⎻⎻⎫"
-	echo "   (_ \\ ( $GREEN$BOLD'$NOCOLOR$WHITE>  〈 SHIP IT!⎟"
-	echo "     ) \\/_)=   ⎩ ⎽⎽⎽⎽⎽⎽⎽⎽⎭"
-	echo "     (_(_ )_"
-	echo "$NOCOLOR"
-}
+
 
 # Read and validate config file
 read_config() {
+  # Check if config file was supplied
+  test -z $CONFIG && abort "You must specify a config file (eg: myconfig[.ship]). See $(basename $0) --help."
+  
 	# Check config file existance
 	test -f $CONFIG || abort "Config file $CONFIG not found." 
 
@@ -88,9 +84,13 @@ read_config() {
 	test -z "$path" && incomplete_config 'path'
 	test -z "$host" || test -z "$path" && exit 1
 	
+	# Use default port if not provided
+	test -z "$port" && port=22
+	
 	# Expose params
 	SSH_HOST=$host
 	SSH_PATH=$path
+	SSH_PORT=$port
 }
 
 # Print message about missing config param
@@ -100,6 +100,7 @@ incomplete_config() {
 
 # Deploy specified target
 deploy() {
+  meta "Using config file: $CONFIG"
 	read_config
 
 	# Check target existance
@@ -114,7 +115,7 @@ deploy() {
 
 	# Shipped?
 	if [ $? -eq 0 ]; then
-		squirrel
+		meta "Deploy successful"
 	else
 		abort "Deploy wasn’t successful."
 	fi
@@ -138,13 +139,13 @@ run() {
 		cd \"$SSH_PATH\"
 		$1
 	"""
-	ssh -A $2 "$SSH_HOST" "$script"
+	ssh -A $2 "$SSH_HOST" -p "$SSH_PORT" "$script"
 }
 
 # Print available targets
 list_targets() {
 	read_config
-	header "Available shipit targets:"
+	header "Available ship targets:"
 	awk '/^\[/ {print "• " $1}' $CONFIG | tr -d ']['
 }
 
@@ -181,20 +182,27 @@ custom_config() {
 ########################################################################################################################
 
 # Parse CLI arguments
-arg=$1; shift
-if [ -n "$arg" ]; then
-	case $arg in
-		-h|--help) usage; exit ;;
-		-V|--version) version; exit ;;
-		-c|--config) custom_config $1; shift; arg=$1; shift ;;
-		--config=*) custom_config $arg; arg=$1; shift ;;
-		-c|--config=*) echo "configs"; exit ;;
-		list|ls) list_targets; exit ;;
-		console|shell|ssh) open_console; exit ;;
-		exec|run) exec_command "$@"; exit ;;
-		copy|cp) copy_to_remote "$@"; exit ;;
-		*) TARGET="$arg" ;;
-	esac
+
+# dispatch shorthand arguments
+ARG=$1; shift
+if [ -n "$ARG" ]; then
+ case $ARG in
+  -h|--help) usage; exit ;;
+  -V|--version) version; exit ;;
+ esac
+fi
+
+CONF="${ARG%.ship}.ship"
+test "$CONF" != ".ship" && CONFIG="$CONF" && ARG=$1 && shift
+
+if [ -n "$ARG" ]; then
+ case $ARG in
+  list|ls) list_targets; exit ;;
+  console|shell|ssh) open_console; exit ;;
+  exec|run) exec_command "$@"; exit ;;
+  copy|cp) copy_to_remote "$@"; exit ;;
+  *) TARGET="$ARG" ;;
+ esac
 fi
 
 # Run specified target
