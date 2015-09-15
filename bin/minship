@@ -139,7 +139,7 @@ run() {
 		cd \"$SSH_PATH\"
 		$1
 	"""
-	ssh -A $2 "$SSH_HOST" -p "$SSH_PORT" "$script"
+	ssh -t -A $2 "$SSH_HOST" -p "$SSH_PORT" "$script"
 }
 
 # Print available targets
@@ -166,9 +166,9 @@ exec_command() {
 # Copy local file to remote host
 copy_to_remote() {
 	read_config
-	test -f "$1" || abort "Local file $1 not found." 
+	test -f "$1" || test -d "$1" || abort "Local item $1 not found." 
 	header "Copying $1 to $SSH_HOST..."
-	scp "$1" "seal:$SSH_PATH/$1"
+	scp -r -P "$SSH_PORT" "$1" "$SSH_HOST:$SSH_PATH/$1"
 }
 
 custom_config() {
