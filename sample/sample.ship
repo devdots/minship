@@ -1,5 +1,10 @@
 host='seal'
 path='sites/my-site'
+port=2004
+key=$HOME/.ssh/mykey
+
+[@deploy]
+minship sample cp images
 
 [deploy]
 git checkout master
