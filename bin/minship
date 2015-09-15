@@ -19,6 +19,7 @@ TARGET=deploy
 SSH_HOST=
 SSH_PATH=
 SSH_PORT=22
+SSH_KEY=
 
 # Common stuff
 RED="$(tput setaf 1)"
@@ -91,6 +92,7 @@ read_config() {
 	SSH_HOST=$host
 	SSH_PATH=$path
 	SSH_PORT=$port
+  SSH_KEY=$key
 }
 
 # Print message about missing config param
@@ -105,13 +107,27 @@ deploy() {
 
 	# Check target existance
 	target_exists $TARGET || abort "Target $TARGET not found in config file."
-
+  
 	# Read target script
 	local script=`awk "/^\[$TARGET\]/ {print; exit}" RS= $CONFIG | sed 1d`
-
-	# Ship it!
-	header "Shipping $TARGET on $SSH_HOST..."
-	run "$script"
+  local prehook=`awk "/^\[@$TARGET\]/ {print; exit}" RS= $CONFIG | sed 1d`
+  
+  # run local pre-hook if exists
+	if target_has_prehook $TARGET ;then
+    header "Running local pre-hook for $TARGET"
+    run_local "$prehook"
+    
+    # Pre-hook ok ?
+    if [ $? -eq 0 ]; then
+      meta "Pre-hook ran successful"
+    else
+      abort "Pre-hook failed"
+    fi
+  fi
+  
+  # run target
+  header "Shipping $TARGET on $SSH_HOST..."
+  run "$script"
 
 	# Shipped?
 	if [ $? -eq 0 ]; then
@@ -124,6 +140,11 @@ deploy() {
 # Check if config <section> exists
 target_exists() {
 	grep "^\[$1\]" $CONFIG &> /dev/null
+}
+
+# Check if config local <section> exists
+target_has_prehook() {
+	grep "^\[@$1\]" $CONFIG &> /dev/null
 }
 
 # Run script or command via SSH with cd to remote path
@@ -139,7 +160,20 @@ run() {
 		cd \"$SSH_PATH\"
 		$1
 	"""
-	ssh -t -A $2 "$SSH_HOST" -p "$SSH_PORT" "$script"
+  
+  local ssh_cmd="ssh"
+  
+  # add cusom key if provided
+  test -z "$SSH_KEY" || ssh_cmd="$ssh_cmd -i $SSH_KEY"
+  
+	$ssh_cmd -t -A $2 "$SSH_HOST" -p "$SSH_PORT" "$script"
+}
+
+run_local() {
+  local script="""
+    $1
+  """
+  bash -c "$script"
 }
 
 # Print available targets
@@ -167,8 +201,11 @@ exec_command() {
 copy_to_remote() {
 	read_config
 	test -f "$1" || test -d "$1" || abort "Local item $1 not found." 
-	header "Copying $1 to $SSH_HOST..."
-	scp -r -P "$SSH_PORT" "$1" "$SSH_HOST:$SSH_PATH/$1"
+  local ssh_cmd="scp"
+  # add cusom key if provided
+  test -z "$SSH_KEY" || ssh_cmd="$ssh_cmd -i $SSH_KEY"
+  header "Copying $1 to $SSH_HOST:$SSH_PATH..."
+	$ssh_cmd -r -P "$SSH_PORT" "$1" "$SSH_HOST:$SSH_PATH/$1"
 }
 
 
