@@ -171,13 +171,6 @@ copy_to_remote() {
 	scp -r -P "$SSH_PORT" "$1" "$SSH_HOST:$SSH_PATH/$1"
 }
 
-custom_config() {
-  conf=$1
-  test "${conf:0:9}" = "--config=" && conf="${conf:9}"
-  meta "Using custom config $conf"
-  CONFIG=$conf
-}
-
 
 ########################################################################################################################
 
